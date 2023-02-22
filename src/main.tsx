@@ -5,39 +5,51 @@ import * as ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
 
-import { logseq as PL } from "../package.json";
+import { pluginId } from "./util";
+import * as lst from "./logseqtrack";
 
 // @ts-expect-error
 const css = (t, ...args) => String.raw(t, ...args);
 
-const pluginId = PL.id;
-
 function main() {
   console.info(`#${pluginId}: MAIN`);
-  const root = ReactDOM.createRoot(document.getElementById("app")!);
+  
+  // templateMainUI();
 
-  root.render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  );
+  lst.settings()
 
-  function createModel() {
-    return {
-      show() {
-        logseq.showMainUI();
-      },
-    };
-  }
+  lst.register()
 
-  logseq.provideModel(createModel());
-  logseq.setMainUIInlineStyle({
-    zIndex: 11,
-  });
+  lst.test()
 
-  const openIconName = "template-plugin-open";
+  console.info(`#${pluginId}: MAIN Done`);
 
-  logseq.provideStyle(css`
+  // Main UI Template not used atm - also App.tsx, utils.ts
+  function templateMainUI() {
+    const root = ReactDOM.createRoot(document.getElementById("app")!);
+
+    root.render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    );
+
+    function createModel() {
+      return {
+        show() {
+          logseq.showMainUI();
+        },
+      };
+    }
+
+    logseq.provideModel(createModel());
+    logseq.setMainUIInlineStyle({
+      zIndex: 11,
+    });
+
+    const openIconName = "template-plugin-open";
+
+    logseq.provideStyle(css`
     .${openIconName} {
       opacity: 0.55;
       font-size: 20px;
@@ -49,12 +61,13 @@ function main() {
     }
   `);
 
-  logseq.App.registerUIItem("toolbar", {
-    key: openIconName,
-    template: `
+    logseq.App.registerUIItem("toolbar", {
+      key: openIconName,
+      template: `
       <div data-on-click="show" class="${openIconName}">⚙️</div>
     `,
-  });
+    });
+  }
 }
 
 logseq.ready(main).catch(console.error);
